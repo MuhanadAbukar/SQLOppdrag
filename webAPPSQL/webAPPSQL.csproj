@@ -67,11 +67,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="create.aspx" />
     <Content Include="Default.aspx" />
     <Content Include="Edit.aspx" />
+    <Content Include="style.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="create.aspx.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="create.aspx.designer.cs">
+      <DependentUpon>create.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -96,6 +105,12 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Ticket-System\DBL\DBL.csproj">
+      <Project>{f1ae16ce-39de-4f0d-ab01-1b389f8f68ae}</Project>
+      <Name>DBL</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,38 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
-using System.Configuration;
-using System.Data.SqlClient;
-
+using DatabaseLayer;
 namespace webAPPSQL
 {
     public partial class Default : System.Web.UI.Page
     {
+        static DBL dbl = new DBL();
+        static SqlCommand cmd1 = new SqlCommand("select * from person", dbl.conn);
 
-        static string connstr = ConfigurationManager.ConnectionStrings["connstr"].ConnectionString;
-        static SqlConnection conn = new SqlConnection(connstr);
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!Page.IsPostBack)
+            if (!Page.IsPostBack)
             {
-                GridView1.DataSource = getAllPeople();
-                GridView1.DataBind();
+                dbl.bindToGridView(dbl.getReader(cmd1), DataGridView);
             }
         }
-        public DataTable getAllPeople()
-        {
-            var d = new DataTable();
-            conn.Open();
-            var cmd = new SqlCommand("select * from person",conn);
-            var reader = cmd.ExecuteReader();
-            d.Load(reader);
-            conn.Close();
-            return d;
-        }
+        
         public void edit(object sender, EventArgs e)
         {
             var btn = (Button)sender;
@@ -41,42 +28,41 @@ namespace webAPPSQL
         public void delete(object sender, EventArgs e)
         {
             var btn = (Button)sender;
-            var cmd = new SqlCommand($"delete from person where id={btn.CommandName}",conn);
-            conn.Open();
-            cmd.ExecuteNonQuery();
-            conn.Close();
+            var cmd = new SqlCommand($"delete from person where id={btn.CommandName}", dbl.conn);
+            dbl.writeToDB(cmd);
             Response.Redirect(Request.RawUrl);
+
         }
         protected void TextBox1_TextChanged(object sender, EventArgs e)
         {
-            if(TextBox1.Text.Length == 0)
+            if(FornavnTextbox.Text.Length == 0 )
             {
-                for (int i = 0; i < GridView1.Rows.Count; i++)
-                {
-                    var rows = GridView1.Rows;
-                    rows[i].Visible = true;
-                }
+
+                var cmd1 = new SqlCommand($"select * from person", dbl.conn);
+                dbl.bindToGridView(dbl.getReader(cmd1), DataGridView);
+
             }
             else
             {
-                for (int i = 0; i < GridView1.Rows.Count; i++)
-                {
-                    var rows = GridView1.Rows;
-                    if (!rows[i].Cells[1].Text.ToLower().Contains(TextBox1.Text.ToLower()))
-                    {
-                        rows[i].Visible = false;
-                    }
-                }
-            }
-              
-        }
-       
 
-        protected void GridView1_PageIndexChanging1(object sender, GridViewPageEventArgs e)
+                var cmd = new SqlCommand($"select * from person where fornavn like '%{FornavnTextbox.Text}%'", dbl.conn);
+                dbl.bindToGridView(dbl.getReader(cmd), DataGridView);
+            }
+        }
+
+
+        protected void DataGridView_PageIndexChanging1(object sender, GridViewPageEventArgs e)
         {
-            GridView1.PageIndex = e.NewPageIndex;
-            GridView1.DataSource = getAllPeople();
-            GridView1.DataBind();
+            DataGridView.PageIndex = e.NewPageIndex; 
+            dbl.bindToGridView(dbl.getReader(cmd1), DataGridView);
+
+        }
+
+        protected void IDSearch(object sender, EventArgs e)
+        {
+
+            var cmd = new SqlCommand($"select * from person where id = {IDTextbox.Text}", dbl.conn);
+            dbl.bindToGridView(dbl.getReader(cmd), DataGridView);
         }
     }
 }

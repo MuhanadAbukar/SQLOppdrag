@@ -1,32 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
+using DatabaseLayer;
 namespace webAPPSQL
 {
     public partial class Edit : System.Web.UI.Page
     {
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            if(!Page.IsPostBack)
+            if (!Page.IsPostBack)
             {
-                var connstr2 = ConfigurationManager.ConnectionStrings["connstr"].ConnectionString;
-                var conn2 = new SqlConnection(connstr2);
+                var dbl = new DBL();
                 var id = Request.QueryString["pnr"];
-                conn2.Close();
-                conn2.Open();
-                var cmd = new SqlCommand($"select * From person where id={id}",conn2);
-                var dt = new DataTable();
-                dt.Load(cmd.ExecuteReader());
-                conn2.Close();
-                GridView1.DataSource = dt;
-                GridView1.DataBind();
+                var cmd = new SqlCommand($"select * From person where id=@id", dbl.conn);
+                dbl.createParam("@id", id, cmd);
+                var reader = dbl.getReader(cmd);
+                dbl.bindToGridView(reader, GridView1);
+                if(GridView1.Rows.Count == 0)
+                {
+                    Response.Redirect("Default.aspx");
+                    return;
+                }
                 Fornavn.Text = GridView1.Rows[0].Cells[1].Text;
                 Etternavn.Text = GridView1.Rows[0].Cells[2].Text;
                 Adresse.Text = GridView1.Rows[0].Cells[3].Text;
@@ -40,53 +38,18 @@ namespace webAPPSQL
 
         protected void Button1_Click(object sender, EventArgs e)
         {
-            var fornavn = new SqlParameter();
-            fornavn.ParameterName = "@fornavn";
-            fornavn.Value = Fornavn.Text;
-
-            var etternavn = new SqlParameter();
-            etternavn.ParameterName = "@etternavn";
-            etternavn.Value = Etternavn.Text;
-
-            var adresse = new SqlParameter();
-            adresse.ParameterName = "@adresse";
-            adresse.Value = Adresse.Text;
-
-            var postnummer = new SqlParameter();
-            postnummer.ParameterName = "@postnummer";
-            postnummer.Value = Postnummer.Text;
-
-            var poststed = new SqlParameter();
-            poststed.ParameterName = "@poststed";
-            poststed.Value = Poststed.Text;
-
-            var alder = new SqlParameter();
-            alder.ParameterName = "@alder";
-            alder.Value = Alder.Text;
-
-            var inntekt = new SqlParameter();
-            inntekt.ParameterName = "@inntekt";
-            inntekt.Value = Inntekt.Text;
-
-            var connstr2 = ConfigurationManager.ConnectionStrings["connstr"].ConnectionString;
-            var conn2 = new SqlConnection(connstr2);
+            var dbl = new DBL();
             var cmd = new SqlCommand();
-
-            cmd.Parameters.Add(fornavn);
-            cmd.Parameters.Add(etternavn);
-            cmd.Parameters.Add(adresse);
-            cmd.Parameters.Add(postnummer);
-            cmd.Parameters.Add(poststed);
-            cmd.Parameters.Add(alder);
-            cmd.Parameters.Add(inntekt);
-
-            cmd.Connection = conn2;
+            dbl.createParam("@fornavn", Fornavn.Text,cmd);
+            dbl.createParam("@etternavn", Etternavn.Text, cmd);
+            dbl.createParam("@adresse", Adresse.Text, cmd);
+            dbl.createParam("@postnummer", Postnummer.Text, cmd);
+            dbl.createParam("@poststed", Poststed.Text, cmd);
+            dbl.createParam("@alder", Alder.Text, cmd);
+            dbl.createParam("@inntekt", Inntekt.Text, cmd);
+            cmd.Connection = dbl.conn;
             cmd.CommandText = $"update person set fornavn = @fornavn, etternavn=@etternavn, adresse=@adresse, postnummer=@postnummer,poststed=@poststed,alder=@alder,inntekt=@inntekt where id={Request.QueryString["pnr"]}";
-
-            conn2.Open();
-            cmd.ExecuteNonQuery();
-            Button1.Text = "Updated";
-            conn2.Close();
+            dbl.writeToDB(cmd);
         }
     }
 }

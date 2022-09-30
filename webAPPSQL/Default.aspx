@@ -4,13 +4,23 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
+  <link rel="stylesheet" href="style.css"/>
     <title></title>
 </head>
 <body>
+    <ul>
+  <li><a class="active" href="Default.aspx">View people</a></li>
+  <li><a href="create.aspx">Create a person</a></li>
+</ul>
     <form id="form1" runat="server">
         <div>
-            <asp:Label ID="Label1" runat="server" Text="Søk med fornavn"></asp:Label><asp:TextBox ID="TextBox1" runat="server" AutoPostBack="true" OnTextChanged="TextBox1_TextChanged"></asp:TextBox>
-            <asp:GridView ID="GridView1" runat="server" AutoGenerateColumns="False" AllowPaging="True" BackColor="#CCCCCC" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" ForeColor="Black" OnPageIndexChanging="GridView1_PageIndexChanging1"  PageSize="5">
+            <asp:Label ID="FornavnLabel" runat="server" Text="Søk med fornavn"></asp:Label><br /><asp:TextBox ID="FornavnTextbox" runat="server" AutoPostBack="true" OnTextChanged="TextBox1_TextChanged"></asp:TextBox>
+            <br />
+            <br />
+             <asp:Label ID="IDLabel" runat="server" Text="Søk med ID"></asp:Label> <br />
+                <asp:TextBox ID="IDTextbox" runat="server" AutoPostBack="true" OnTextChanged="IDSearch"></asp:TextBox>
+            <br />
+            <br /><asp:GridView ID="DataGridView" runat="server" AutoGenerateColumns="False" AllowPaging="True" BackColor="#CCCCCC" BorderColor="#999999" BorderStyle="Solid" BorderWidth="3px" CellPadding="4" CellSpacing="2" ForeColor="Black" OnPageIndexChanging="DataGridView_PageIndexChanging1"  PageSize="5">
                 <Columns>
                     <asp:BoundField DataField="Id" HeaderText="Personnummer" />
                     <asp:BoundField DataField="Fornavn" HeaderText="Fornavn" />
