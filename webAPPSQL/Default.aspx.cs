@@ -60,9 +60,20 @@ namespace webAPPSQL
 
         protected void IDSearch(object sender, EventArgs e)
         {
+            if (IDTextbox.Text.Length == 0)
+            {
 
-            var cmd = new SqlCommand($"select * from person where id = {IDTextbox.Text}", dbl.conn);
-            dbl.bindToGridView(dbl.getReader(cmd), DataGridView);
+                var cmd1 = new SqlCommand($"select * from person", dbl.conn);
+                dbl.bindToGridView(dbl.getReader(cmd1), DataGridView);
+
+            }
+            else
+            {
+
+                var cmd = new SqlCommand($"select * from person where id = {IDTextbox.Text}", dbl.conn);
+                dbl.bindToGridView(dbl.getReader(cmd), DataGridView);
+            }
+            
         }
     }
 }
